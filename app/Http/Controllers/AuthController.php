@@ -28,7 +28,7 @@ class AuthController extends Controller
         $credentials = request(['dni', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return jsonResponse(status: 401, message: 'Bad credentials.');
         }
 
         $user = auth()->user();
@@ -54,7 +54,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return jsonResponse(message: 'Successfully logged out');
     }
 
     /**
@@ -76,7 +76,7 @@ class AuthController extends Controller
      */
     protected function respondWithToken(string $token, User $user)
     {
-        return response()->json([
+        return jsonResponse(data: [
             'account' => new UserResource($user),
             'access_token' => $token,
             'token_type' => 'bearer',
