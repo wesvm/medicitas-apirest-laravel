@@ -3,15 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Roles;
+use App\Traits\HasSearch;
+use App\Traits\HasSort;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasSearch, HasSort;
 
     /**
      * The attributes that are mass assignable.
@@ -19,17 +23,34 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
+        'first_name',
+        'last_name',
+        'phone',
         'dni',
         'email',
         'password',
         'role',
         'is_active',
-        'email_verified'
     ];
 
-    public function admin(): HasOne
+    public function searchFields(): array
     {
-        return $this->hasOne(Admin::class);
+        return ['first_name', 'last_name', 'dni'];
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+
+    public function scopeByRole(Builder $query, Roles $role): void
+    {
+        $query->where('role', $role->value);
+    }
+
+    public function patient(): HasOne
+    {
+        return $this->hasOne(Patient::class);
     }
 
     /**
@@ -50,7 +71,6 @@ class User extends Authenticatable implements JWTSubject
     protected function casts(): array
     {
         return [
-            'email_verified' => 'boolean',
             'password' => 'hashed',
             'is_active' => 'boolean'
         ];
