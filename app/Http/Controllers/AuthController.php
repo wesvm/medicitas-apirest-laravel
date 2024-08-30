@@ -15,7 +15,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api')->except('login');
     }
 
     /**
@@ -32,6 +32,12 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
+
+        if (!$user->is_active) {
+            auth()->logout();
+            return jsonResponse(status: 403, message: 'User is not active.');
+        }
+
         return $this->respondWithToken($token, $user);
     }
 
@@ -80,7 +86,7 @@ class AuthController extends Controller
             'account' => new UserResource($user),
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 180
+            'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
 }
