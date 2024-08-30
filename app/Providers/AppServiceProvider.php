@@ -23,11 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-         Route::bind('id', function ($value) {
-             if (!is_numeric($value)) {
-                 abort(400, 'Invalid ID format.');
-             }
-             return $value;
-         });
+        Route::pattern('id', '[0-9]+');
     }
 }
