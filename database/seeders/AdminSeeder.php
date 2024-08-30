@@ -4,9 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Admin;
 use App\Models\User;
-use Carbon\Carbon;
-use Hash;
 use Illuminate\Database\Seeder;
+use Hash;
 
 class AdminSeeder extends Seeder
 {
@@ -16,18 +15,17 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
+            'first_name' => 'Admin',
+            'last_name' => 'Admin',
+            'phone' => '987654321',
             'dni' => '76543210',
             'password' => Hash::make('admin'),
             'email' => 'admin@mail.com',
-            'role' => 'admin',
-            'email_verified' => true
+            'role' => 'admin'
         ]);
 
         Admin::create([
             'user_id' => $admin->id,
-            'first_name' => 'Admin',
-            'last_name' => 'Admin',
-            'phone' => '987654321'
         ]);
     }
 }
