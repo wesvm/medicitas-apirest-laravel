@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Roles;
-use App\Http\Requests\Password\ForgotPasswordRequest;
-use App\Http\Requests\Password\ResetPasswordRequest;
 use App\Mail\PasswordResetMail;
 use App\Models\User;
 use App\Models\Token;
@@ -17,12 +14,14 @@ class PasswordController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api')->only('changePassword');
+        $this->middleware('auth:api')->only('update');
     }
 
-    public function forgotPassword(ForgotPasswordRequest $request)
+    public function forgot(Request $request)
     {
-        $user = User::where('dni', $request->dni)->first();
+        $request->validate(['dni' => 'required|string|digits:8|exists:users,dni']);
+
+        $user = User::where('dni', $request->get('dni'))->first();
         $token = Str::uuid();
 
         Token::create([
@@ -34,14 +33,18 @@ class PasswordController extends Controller
             'user_id' => $user->id
         ]);
 
-        $this->getUserDataByRole($user);
-
         Mail::to($user->email)->send(new PasswordResetMail($user, $token));
         return jsonResponse(message: 'Token has sent to your email.');
     }
 
-    public function resetPassword(ResetPasswordRequest $request){
-        $token = Token::where('token', $request->token)->first();
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'password' => 'required|string|confirmed|min:3'
+        ]);
+
+        $token = Token::where('token', $request->get('token'))->first();
 
         if (!$token) return jsonResponse(status: 400, message: 'Invalid token.');
 
@@ -51,37 +54,27 @@ class PasswordController extends Controller
         }
 
         $user = User::find($token->user_id);
-        $user->password = bcrypt($request->password);
+        $user->password = bcrypt($request->get('password'));
         $user->save();
         $token->delete();
-        return jsonResponse(message: 'Password has been reset.');
+        return jsonResponse(message: 'Your password has been reset.');
     }
 
-    public function changePassword(Request $request)
+    public function update(Request $request)
     {
         $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:3', 'confirmed'],
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:3|confirmed'
         ]);
 
         $user = auth()->user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return jsonResponse(status: 400, message: 'Current password is incorrect.');
+        if (!Hash::check($request->get('current_password'), $user->password)) {
+            return jsonResponse(status: 400, message: 'Your current password is incorrect.');
         }
 
-        $user->password = bcrypt($request->new_password);
+        $user->password = bcrypt($request->get('new_password'));
         $user->save();
-        return jsonResponse(message: 'Password has been changed.');
-    }
-
-    private function getUserDataByRole(User $user): void
-    {
-        switch ($user->role) {
-            case Roles::ADMIN->value:
-                $user->load('admin');
-                break;
-            default:
-        }
+        return jsonResponse(message: 'Your password has been changed.');
     }
 }

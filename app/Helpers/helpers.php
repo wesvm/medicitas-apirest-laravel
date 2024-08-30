@@ -29,8 +29,9 @@ function transactional(Closure $callback)
         $result = $callback();
         DB::commit();
         return $result;
-    } catch (\Exception $exception) {
+    } catch (Exception $exception) {
         DB::rollBack();
+        Log::error($exception->getMessage());
         return jsonResponse(status: 500, message: 'An error occurred.');
     }
 }
