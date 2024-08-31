@@ -48,9 +48,19 @@ class User extends Authenticatable implements JWTSubject
         $query->where('role', $role->value);
     }
 
+    public function admin(): HasOne
+    {
+        return $this->hasOne(Admin::class);
+    }
+
     public function patient(): HasOne
     {
         return $this->hasOne(Patient::class);
+    }
+
+    public function doctor(): HasOne
+    {
+        return $this->hasOne(Doctor::class);
     }
 
     /**
