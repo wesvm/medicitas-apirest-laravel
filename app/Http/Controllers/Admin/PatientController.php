@@ -16,7 +16,7 @@ class PatientController extends Controller
 
     public function __construct()
     {
-        $this->middleware('role:admin');
+        $this->middleware('role:admin,doctor');
     }
 
     /**
@@ -139,7 +139,7 @@ class PatientController extends Controller
         $patient->user->update(['is_active' => false]);
 
         return jsonResponse(
-            message: 'User deactivated successfully.',
+            message: 'Patient deactivated successfully.',
         );
     }
 }

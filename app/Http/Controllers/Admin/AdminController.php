@@ -13,6 +13,11 @@ use Illuminate\Http\Request;
 class AdminController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('role:admin');
+    }
+
     public function index(Request $request)
     {
         $perPage = 10;
@@ -39,12 +44,12 @@ class AdminController extends Controller
     {
         return transactional(function () use ($request) {
             $user = User::create([
-                'first_name' => $request->firstName,
-                'last_name' => $request->lastName,
-                'phone' => $request->phone ?? null,
-                'dni' => $request->dni,
-                'email' => $request->email,
-                'password' => bcrypt($request->dni),
+                'first_name' => $request->get('firstName'),
+                'last_name' => $request->get('lastName'),
+                'phone' => $request->get('phone') ?? null,
+                'dni' => $request->get('dni'),
+                'email' => $request->get('email'),
+                'password' => bcrypt($request->get('dni')),
                 'role' => Roles::ADMIN->value,
             ]);
 
@@ -65,9 +70,28 @@ class AdminController extends Controller
         return jsonResponse(data: ['user' => new AdminResource($admin)]);
     }
 
-    public function update($request, Admin $admin)
+    public function update(UserRequest $request, User $admin)
     {
-        // TODO: HERE
+        return transactional(function () use ($request, $admin) {
+            $admin->first_name = $request->get('firstName');
+            $admin->last_name = $request->get('lastName');
+            $admin->phone = $request->get('phone');
+            $admin->dni = $request->get('dni');
+            $admin->email = $request->get('email');
+
+            if($admin->isDirty()){
+                $admin->save();
+                return jsonResponse(
+                    message: 'Admin updated successfully',
+                    data: ['user' => new AdminResource($admin)]
+                );
+            }
+
+            return jsonResponse(
+                message: 'No changes detected',
+                data: ['user'=> new AdminResource($admin)]
+            );
+        });
     }
 
     public function destroy(Admin $admin)
