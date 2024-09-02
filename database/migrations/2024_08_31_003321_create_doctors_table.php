@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id');
             $table->foreignId('schedule_id');
+            $table->string('specialty');
             $table->timestamps();
         });
     }

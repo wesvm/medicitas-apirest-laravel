@@ -12,6 +12,7 @@ class Doctor extends Model
     protected $fillable = [
         'user_id',
         'schedule_id',
+        'specialty',
     ];
 
     public function user(): BelongsTo
