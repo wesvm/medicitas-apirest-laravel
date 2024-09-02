@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\admin\AdminController;
+use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DoctorScheduleController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\Patient\PatientProfileController;
 use Illuminate\Support\Facades\Route;
@@ -21,10 +23,13 @@ Route::prefix('password')->group(function () {
 });
 
 Route::group([
-    'middleware' => ['auth:api', 'role:admin'],
+    'middleware' => 'auth:api',
 ], function () {
     Route::apiResource('admins', AdminController::class);
     Route::apiResource('patients', PatientController::class);
+    Route::apiResource('doctors', DoctorController::class);
+
+    Route::get('schedules', [DoctorScheduleController::class, 'index']);
 });
 
 Route::group([
