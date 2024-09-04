@@ -1,13 +1,19 @@
 <?php
 
-use App\Http\Controllers\admin\AdminController;
+use App\Http\Controllers\Admin\UserController;
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\DoctorScheduleController;
+
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\PatientController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DoctorScheduleController;
-use App\Http\Controllers\PasswordController;
+
+use App\Http\Controllers\Patient\AppointmentController;
 use App\Http\Controllers\Patient\PatientProfileController;
-use Illuminate\Support\Facades\Route;
+
 
 Route::prefix('auth')->group(function () {
     Route::post('login', AuthController::class.'@login');
@@ -28,6 +34,7 @@ Route::group([
     Route::apiResource('admins', AdminController::class);
     Route::apiResource('patients', PatientController::class);
     Route::apiResource('doctors', DoctorController::class);
+    Route::apiResource('users', UserController::class)->except(['store', 'destroy']);
 
     Route::get('schedules', [DoctorScheduleController::class, 'index']);
 });
@@ -38,4 +45,6 @@ Route::group([
 ], function () {
     Route::get('profile', [PatientProfileController::class, 'show']);
     Route::put('profile', [PatientProfileController::class, 'update']);
+
+    Route::apiResource('appointments', AppointmentController::class);
 });
