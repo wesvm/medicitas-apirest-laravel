@@ -34,7 +34,7 @@ trait HasSearch
 
         $builder->where(function (Builder $builder) use ($fields, $search) {
             foreach (explode(' ', $search) as $word) {
-                $builder->whereAny($fields, 'LIKE', "%{$word}%");
+                $builder->whereAny($fields, 'ILIKE', "%$word%");
             }
         });
 
