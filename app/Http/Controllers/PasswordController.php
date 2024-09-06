@@ -24,17 +24,19 @@ class PasswordController extends Controller
         $user = User::where('dni', $request->get('dni'))->first();
         $token = Str::uuid();
 
-        Token::create([
-            'token' => $token,
-            'token_type' => 'forgot_password',
-            'revoked' => false,
-            'expired' => false,
-            'expires_at' => now()->addMinutes(5),
-            'user_id' => $user->id
-        ]);
+        return transactional(function () use ($user, $token) {
+            Token::create([
+                'token' => $token,
+                'token_type' => 'forgot_password',
+                'revoked' => false,
+                'expired' => false,
+                'expires_at' => now()->addMinutes(5),
+                'user_id' => $user->id
+            ]);
 
-        Mail::to($user->email)->send(new PasswordResetMail($user, $token));
-        return jsonResponse(message: 'Token has sent to your email.');
+            Mail::to($user->email)->send(new PasswordResetMail($user, $token));
+            return jsonResponse(message: 'Token has sent to your email.');
+        });
     }
 
     public function reset(Request $request)
