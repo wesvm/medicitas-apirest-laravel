@@ -4,7 +4,13 @@ namespace App\Enums;
 
 enum AppointmentStatus: string
 {
-    case SCHEDULED = 'Scheduled';
-    case COMPLETED = 'Completed';
-    case CANCELLED = 'Cancelled';
+    case SCHEDULED = 'scheduled';
+    case COMPLETED = 'completed';
+    case CANCELLED = 'cancelled';
+    case MISSED = 'missed';
+
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }
