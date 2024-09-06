@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
@@ -10,8 +9,12 @@ use App\Http\Controllers\DoctorScheduleController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\PatientController;
+use App\Http\Controllers\Admin\UserController;
 
-use App\Http\Controllers\Patient\AppointmentController;
+use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
+use App\Http\Controllers\Doctor\DoctorProfileController;
+
+use App\Http\Controllers\Patient\AppointmentController as PatientAppointmentController;
 use App\Http\Controllers\Patient\PatientProfileController;
 
 
@@ -40,11 +43,21 @@ Route::group([
 });
 
 Route::group([
+    'middleware' => ['auth:api', 'role:doctor'],
+    'prefix' => 'doctor'
+], function () {
+    Route::get('profile', [DoctorProfileController::class, 'show']);
+    Route::put('profile', [DoctorProfileController::class, 'update']);
+
+    Route::apiResource('appointments', DoctorAppointmentController::class);
+});
+
+Route::group([
     'middleware' => ['auth:api', 'role:patient'],
     'prefix' => 'patient'
 ], function () {
     Route::get('profile', [PatientProfileController::class, 'show']);
     Route::put('profile', [PatientProfileController::class, 'update']);
 
-    Route::apiResource('appointments', AppointmentController::class);
+    Route::apiResource('appointments', PatientAppointmentController::class);
 });
