@@ -11,7 +11,7 @@ class StoreDoctorRequest extends FormRequest
     public function rules(): array
     {
         $userRequestRules = (new UserRequest())->rules();
-        $specialties = implode(',', Specialty::getValues());
+        $specialties = implode(',', Specialty::values());
         return array_merge($userRequestRules, [
             'scheduleId' => 'required|string|exists:doctor_schedules,id',
             'specialty' => 'required|in:' . $specialties,

@@ -9,7 +9,7 @@ class UpdateDoctorRequest extends FormRequest
 {
     public function rules(): array
     {
-        $specialties = implode(',', Specialty::getValues());
+        $specialties = implode(',', Specialty::values());
         return [
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
