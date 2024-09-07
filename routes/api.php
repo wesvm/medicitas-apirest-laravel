@@ -10,9 +10,11 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ReportController;
 
 use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
 use App\Http\Controllers\Doctor\DoctorProfileController;
+use App\Http\Controllers\Doctor\ConsultationController;
 
 use App\Http\Controllers\Patient\AppointmentController as PatientAppointmentController;
 use App\Http\Controllers\Patient\PatientProfileController;
@@ -43,6 +45,13 @@ Route::group([
 });
 
 Route::group([
+    'middleware' => ['auth:api', 'role:admin'],
+    'prefix' => 'admin'
+], function () {
+    Route::get('reports', [ReportController::class, 'index']);
+});
+
+Route::group([
     'middleware' => ['auth:api', 'role:doctor'],
     'prefix' => 'doctor'
 ], function () {
@@ -50,6 +59,7 @@ Route::group([
     Route::put('profile', [DoctorProfileController::class, 'update']);
 
     Route::apiResource('appointments', DoctorAppointmentController::class);
+    Route::apiResource('consultations', ConsultationController::class);
 });
 
 Route::group([
