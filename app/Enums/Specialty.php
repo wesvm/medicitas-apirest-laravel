@@ -4,10 +4,11 @@ namespace App\Enums;
 
 enum Specialty: string
 {
-    case PSYCHOLOGY = 'Psychology';
-    case ODONTOLOGY = 'Odontology';
+    case PSYCHOLOGY = 'psychology';
+    case ODONTOLOGY = 'odontology';
 
-    public static function getValues(): array {
-        return array_map(fn($enum) => $enum->value, self::cases());
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
     }
 }
